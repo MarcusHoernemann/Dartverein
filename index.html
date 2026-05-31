@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dart Spielbericht</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --bg: #f5f6fa;
+            --text: #2f3640;
+            --border: #dcdde1;
+            --danger: #e74c3c;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 15px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: var(--secondary);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        textarea,
+        select {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px; 
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        input[readonly] {
+            background-color: #f1f2f6;
+            color: #7f8fa6;
+            cursor: not-allowed;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .player-grid {
+            display: grid;
+            grid-template-columns: 90px 1fr 1fr;
+            gap: 8px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .player-grid div {
+            font-size: 0.9em;
+        }
+
+        .ersatz-bg {
+            background-color: #ced6e0 !important; 
+        }
+
+        /* Styling für die Spielblöcke */
+        .block-container {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .block-title {
+            background-color: var(--secondary);
+            color: white;
+            padding: 10px 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .match-row {
+            display: grid;
+            grid-template-columns: 50px 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .match-row:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .match-header {
+            font-weight: bold;
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .dynamic-player {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        /* --- NEU: Spielername neben H/G --- */
+        .player-name-display {
+            font-size: 0.5em; /* Halb so groß */
+            font-weight: normal; /* Nicht in fett */
+            margin-left: 4px;
+            color: var(--secondary);
+            vertical-align: middle;
+        }
+
+        .set-controls {
+            display: inline-flex;
+            gap: 8px;
+            vertical-align: middle;
+        }
+
+        .set-box {
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .set-box.active {
+            background-color: #2ecc71;
+            border-color: #27ae60;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+        }
+
+        .sub-row {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px;
+            background-color: #e8f4f8;
+        }
+
+        .sub-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sub-group label {
+            font-size: 0.85em;
+            margin-bottom: 5px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .sub-twin-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .compact-sub {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 2px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .compact-sub select {
+            padding: 6px;
+            font-size: 14px;
+            border: none;
+            background: transparent;
+            width: 100%;
+            margin: 0;
+            box-shadow: none;
+        }
+
+        .compact-sub select:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .compact-sub span {
+            font-size: 12px;
+            padding: 0 4px;
+            color: var(--secondary);
+        }
+
+        button.submit-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button.submit-btn:hover {
+            background-color: #2980b9;
+        }
+
+        button.submit-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .status-msg {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            display: none;
+        }
+
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+
+        /* --- Einstellungen Leiste (Heim/Gast & Strafe in einer Zeile) --- */
+        .settings-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fafbfc; 
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #ecf0f1;
+            margin-bottom: 15px;
+            font-size: 10px; 
+            color: #2f3640; 
+        }
+
+        .settings-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-group label {
+            margin-bottom: 0;
+            color: #2f3640; 
+            font-weight: normal;
+            font-size: 10px; 
+        }
+
+        .settings-group .radio-label {
+            font-weight: normal;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .settings-group input[type="radio"] {
+            width: auto;
+            margin: 0;
+            transform: scale(0.8);
+        }
+
+        .settings-group input[type="number"] {
+            width: 45px;
+            padding: 2px 4px;
+            font-size: 10px;
+            height: auto;
+            border: 1px solid #ecf0f1;
+            background-color: #ffffff;
+            color: #2f3640; 
+            border-radius: 4px;
+            -moz-appearance: textfield; 
+        }
+
+        .settings-group input[type="number"]::-webkit-outer-spin-button,
+        .settings-group input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* --- Kompakte Ergebnisse in 2 Zeilen --- */
+        .result-container {
+            background: #f8f9fa;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .result-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .result-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-weight: 600;
+            min-width: 130px;
+            color: var(--primary);
+        }
+
+        .result-row label {
+            margin-bottom: 0;
+            font-size: 0.9em;
+            color: var(--secondary);
+        }
+
+        .result-row input {
+            width: 60px;
+            padding: 6px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* --- Floating Action Button (FAB) & Modal --- */
+        .fab {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background-color: #2c3e50;
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            width: 65px;
+            height: 65px;
+            font-size: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .counter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .counter-name {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: var(--primary);
+            flex-grow: 1;
+        }
+
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .counter-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        
+        .counter-btn.minus {
+            background: var(--secondary);
+        }
+
+        .counter-val {
+            font-weight: bold;
+            font-size: 1.2em;
+            width: 25px;
+            text-align: center;
+        }
+
+        .modal-close {
+            margin-top: 20px;
+            background-color: var(--secondary);
+        }
+        .modal-close:hover {
+            background-color: var(--primary);
+        }
+
+        @media (max-width: 600px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .match-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
+                padding: 15px 10px;
+            }
+            .match-header {
+                display: none;
+            }
+            .mobile-label {
+                display: inline-block;
+                width: 90px;
+                font-weight: bold;
+            }
+            .result-row {
+                flex-wrap: wrap;
+            }
+            .result-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            .sub-twin-container {
+                grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            }
+            .settings-bar {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Dart Spielbericht</h1>
+    
+    <form id="dartForm">
+        
+        <div class="settings-bar">
+            <div class="settings-group">
+                <label>Mannschaft:</label>
+                <label class="radio-label"><input type="radio" name="teamRolle" value="Heim" checked> Heim</label>
+                <label class="radio-label"><input type="radio" name="teamRolle" value="Gast"> Gast</label>
+            </div>
+            <div class="settings-group">
+                <label for="strafeWert">Strafe pro Fehlwurf (€):</label>
+                <input type="number" id="strafeWert" step="0.01" value="0.20" min="0">
+            </div>
+        </div>
+
+        <div class="grid-4">
+            <div class="form-group">
+                <label>Datum</label>
+                <input type="date" id="datum" required>
+            </div>
+            <div class="form-group">
+                <label>Liga-Gruppe</label>
+                <input type="text" id="liga" required>
+            </div>
+            <div class="form-group">
+                <label>Spielnr.</label>
+                <input type="text" id="spielnr">
+            </div>
+            <div class="form-group">
+                <label>Disziplin</label>
+                <select id="disziplin">
+                    <option value="301 Single out">301 Single out</option>
+                    <option value="301 Master out">301 Master out</option>
+                    <option value="501 Master out">501 Master out</option>
+                    <option value="501 Double out">501 Double out</option>
+                </select>
+            </div>
+        </div>
+
+        <h2>Mannschaftsaufstellung</h2>
+        <div class="grid-2">
+            <div>
+                <div class="form-group">
+                    <label>Heim-Team (Teamname)</label>
+                    <input type="text" id="heimTeam" required>
+                </div>
+                <div class="form-group">
+                    <label>Teamkapitän (Heim)</label>
+                    <input type="text" id="kapitaenHeim">
+                </div>
+                <div class="player-grid" id="heimRoster">
+                    <div><strong>Pos.</strong></div><div><strong>Spielername</strong></div><div><strong>Passnr.</strong></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="form-group">
+                    <label>Gast-Team (Teamname)</label>
+                    <input type="text" id="gastTeam" required>
+                </div>
+                <div class="form-group">
+                    <label>Teamkapitän (Gast)</label>
+                    <input type="text" id="kapitaenGast">
+                </div>
+                <div class="player-grid" id="gastRoster">
+                    <div><strong>Pos.</strong></div><div><strong>Spielername</strong></div><div><strong>Passnr.</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Spielplan</h2>
+        <div id="matchesContainer">
+        </div>
+
+        <h2>Endergebnis & Gewinnsätze</h2>
+        <div class="result-container">
+            <div class="result-row">
+                <span class="result-label">Spielergebnis:</span>
+                <label>Heim</label> <input type="number" id="spielergebnisHeim" readonly placeholder="0">
+                <label>Gast</label> <input type="number" id="spielergebnisGast" readonly placeholder="0">
+            </div>
+            <div class="result-row">
+                <span class="result-label">Gewinnsätze:</span>
+                <label>Heim</label> <input type="number" id="gewinnsaetzeHeim" readonly placeholder="0">
+                <label>Gast</label> <input type="number" id="gewinnsaetzeGast" readonly placeholder="0">
+            </div>
+        </div>
+
+        <h2>Bestleistungen</h2>
+        <div>
+            <div class="form-group">
+                <label>High Score (180, 171, 162,151, immer nur das gleiche Triple Segment. Bull Eye 3x)</label>
+                <input type="text" id="highScore">
+            </div>
+            <div class="form-group">
+                <label>High Finish (ab 100)</label>
+                <input type="text" id="highFinish">
+            </div>
+            <div class="form-group">
+                <label>Short Game (301 bis 12 Darts / 501 bis 18 Darts)</label>
+                <input type="text" id="shortGame">
+            </div>
+            <div class="form-group">
+                <label>Bull Eye Check</label>
+                <input type="text" id="bullEye">
+            </div>
+        </div>
+
+        <h2>Bemerkungen</h2>
+        <div class="form-group">
+            <textarea id="bemerkungen" rows="3"></textarea>
+        </div>
+
+        <button type="submit" id="submitBtn" class="submit-btn">Spielbericht speichern</button>
+        <div id="statusMessage" class="status-msg"></div>
+    </form>
+</div>
+
+<button type="button" class="fab" id="openModalBtn">⚫</button>
+
+<div id="blackRingModal" class="modal">
+    <div class="modal-content">
+        <h2 style="margin-top: 0; font-size: 1.5em; border-bottom: none;">Schwarzer Ring Zähler</h2>
+        <p style="font-size: 0.9em; color: var(--secondary); margin-top: -10px;">Strafkasse: <span id="currentPenaltyDisplay">0,20</span> € / Wurf</p>
+        <div id="blackRingList">
+        </div>
+        <button type="button" class="submit-btn modal-close" id="closeModalBtn">Fertig</button>
+    </div>
+</div>
+
+<script>
+    // --- KONFIGURATION ---
+    const WEB_APP_URL = "HIER_DEINE_KOPIERTE_URL_EINTRAGEN";
+    const MEIN_VEREIN = "DC Isso";
+
+    // --- Straf-Feld Formatierung auf 2 Nachkommastellen beim Verlassen des Feldes ---
+    const strafeInput = document.getElementById('strafeWert');
+    strafeInput.addEventListener('blur', function() {
+        if(this.value) {
+            this.value = parseFloat(this.value).toFixed(2);
+            document.getElementById('currentPenaltyDisplay').textContent = this.value.replace('.', ',');
+        }
+    });
+
+    // Generierung der 6 Spielerpositionen (4 Stamm + 2 Ersatz) mit Hinterlegungsfarbe für Ersatz
+    const heimRoster = document.getElementById('heimRoster');
+    const gastRoster = document.getElementById('gastRoster');
+
+    for (let i = 1; i <= 6; i++) {
+        const label = i > 4 ? `H${i} (Ersatz)` : `H${i}`;
+        const bgClass = i > 4 ? 'ersatz-bg' : '';
+        heimRoster.innerHTML += `
+            <div><strong>${label}</strong></div>
+            <div><input type="text" class="player-name-h ${bgClass}" data-idx="${i}"></div>
+            <div><input type="text" class="player-pass-h ${bgClass}" data-idx="${i}"></div>
+        `;
+    }
+
+    for (let i = 1; i <= 6; i++) {
+        const label = i > 4 ? `G${i} (Ersatz)` : `G${i}`;
+        const bgClass = i > 4 ? 'ersatz-bg' : '';
+        gastRoster.innerHTML += `
+            <div><strong>${label}</strong></div>
+            <div><input type="text" class="player-name-g ${bgClass}" data-idx="${i}"></div>
+            <div><input type="text" class="player-pass-g ${bgClass}" data-idx="${i}"></div>
+        `;
+    }
+
+    const basePairings = [
+        [1,1], [2,2], [3,3], [4,4], // Block 1
+        [1,2], [2,4], [3,1], [4,3], // Block 2
+        [1,3], [2,1], [3,4], [4,2], // Block 3
+        [1,4], [2,3], [3,2], [4,1]  // Block 4
+    ];
+
+    const matchesContainer = document.getElementById('matchesContainer');
+    let currentBlock = null;
+
+    basePairings.forEach((paarung, index) => {
+        const gameNr = index + 1;
+        const blockNr = Math.ceil(gameNr / 4);
+
+        if (gameNr % 4 === 1) {
+            currentBlock = document.createElement('div');
+            currentBlock.className = 'block-container';
+            currentBlock.innerHTML = `
+                <div class="block-title">Block ${blockNr}</div>
+                <div class="match-row match-header">
+                    <div>Spiel</div>
+                    <div>Heim</div>
+                    <div>Gast</div>
+                    <div>Sätze Heim</div>
+                    <div>Sätze Gast</div>
+                </div>
+            `;
+            matchesContainer.appendChild(currentBlock);
+        }
+
+        const row = document.createElement('div');
+        row.className = 'match-row';
+        row.innerHTML = `
+            <div><strong>#${gameNr}</strong></div>
+            <div><span class="mobile-label">Heim:</span> <span id="label-heim-${gameNr}" class="dynamic-player">H${paarung[0]}</span></div>
+            <div><span class="mobile-label">Gast:</span> <span id="label-gast-${gameNr}" class="dynamic-player">G${paarung[1]}</span></div>
+            <div>
+                <span class="mobile-label">Sätze H:</span>
+                <div class="set-controls" id="heim-sets-${gameNr}">
+                    <div class="set-box"></div>
+                    <div class="set-box"></div>
+                </div>
+            </div>
+            <div>
+                <span class="mobile-label">Sätze G:</span>
+                <div class="set-controls" id="gast-sets-${gameNr}">
+                    <div class="set-box"></div>
+                    <div class="set-box"></div>
+                </div>
+            </div>
+        `;
+        currentBlock.appendChild(row);
+
+        // Nach Spiel 4, 8 und 12 (Ende von Block 1, 2, 3) die Auswechsel-Optionen einblenden
+        if (gameNr % 4 === 0 && blockNr < 4) {
+            const subRow = document.createElement('div');
+            subRow.className = 'sub-row';
+            subRow.innerHTML = `
+                <div class="sub-group">
+                    <label>Wechsel Heim nach Block ${blockNr}</label>
+                    <div class="sub-twin-container">
+                        <div class="compact-sub">
+                            <select class="sub-heim-out-1 sub-trigger" data-block="${blockNr}">
+                                <option value="">Raus</option>
+                                <option value="1">H1</option>
+                                <option value="2">H2</option>
+                                <option value="3">H3</option>
+                                <option value="4">H4</option>
+                            </select>
+                            <span>➡️</span>
+                            <select class="sub-heim-in-1 sub-trigger" data-block="${blockNr}">
+                                <option value="">Rein</option>
+                                <option value="H5">H5</option>
+                                <option value="H6">H6</option>
+                            </select>
+                        </div>
+                        <div class="compact-sub">
+                            <select class="sub-heim-out-2 sub-trigger" data-block="${blockNr}">
+                                <option value="">Raus</option>
+                                <option value="1">H1</option>
+                                <option value="2">H2</option>
+                                <option value="3">H3</option>
+                                <option value="4">H4</option>
+                            </select>
+                            <span>➡️</span>
+                            <select class="sub-heim-in-2 sub-trigger" data-block="${blockNr}">
+                                <option value="">Rein</option>
+                                <option value="H5">H5</option>
+                                <option value="H6">H6</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="sub-group">
+                    <label>Wechsel Gast nach Block ${blockNr}</label>
+                    <div class="sub-twin-container">
+                        <div class="compact-sub">
+                            <select class="sub-gast-out-1 sub-trigger" data-block="${blockNr}">
+                                <option value="">Raus</option>
+                                <option value="1">G1</option>
+                                <option value="2">G2</option>
+                                <option value="3">G3</option>
+                                <option value="4">G4</option>
+                            </select>
+                            <span>➡️</span>
+                            <select class="sub-gast-in-1 sub-trigger" data-block="${blockNr}">
+                                <option value="">Rein</option>
+                                <option value="G5">G5</option>
+                                <option value="G6">G6</option>
+                            </select>
+                        </div>
+                        <div class="compact-sub">
+                            <select class="sub-gast-out-2 sub-trigger" data-block="${blockNr}">
+                                <option value="">Raus</option>
+                                <option value="1">G1</option>
+                                <option value="2">G2</option>
+                                <option value="3">G3</option>
+                                <option value="4">G4</option>
+                            </select>
+                            <span>➡️</span>
+                            <select class="sub-gast-in-2 sub-trigger" data-block="${blockNr}">
+                                <option value="">Rein</option>
+                                <option value="G5">G5</option>
+                                <option value="G6">G6</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+            currentBlock.appendChild(subRow);
+        }
+    });
+
+    function calculateTotals() {
+        let totalHeimSets = 0;
+        let totalGastSets = 0;
+        let totalHeimGames = 0;
+        let totalGastGames = 0;
+        
+        for(let i = 1; i <= 16; i++) {
+            let heimSets = document.querySelectorAll(`#heim-sets-${i} .set-box.active`).length;
+            let gastSets = document.querySelectorAll(`#gast-sets-${i} .set-box.active`).length;
+            
+            totalHeimSets += heimSets;
+            totalGastSets += gastSets;
+            
+            if (heimSets === 2) {
+                totalHeimGames++;
+            }
+            if (gastSets === 2) {
+                totalGastGames++;
+            }
+        }
+        
+        document.getElementById('gewinnsaetzeHeim').value = totalHeimSets;
+        document.getElementById('gewinnsaetzeGast').value = totalGastSets;
+        document.getElementById('spielergebnisHeim').value = totalHeimGames;
+        document.getElementById('spielergebnisGast').value = totalGastGames;
+    }
+
+    document.getElementById('matchesContainer').addEventListener('click', function(e) {
+        if (e.target.classList.contains('set-box')) {
+            e.target.classList.toggle('active');
+            calculateTotals();
+        }
+    });
+
+    function updateMatches() {
+        let heimSlots = { 1: 'H1', 2: 'H2', 3: 'H3', 4: 'H4' };
+        let gastSlots = { 1: 'G1', 2: 'G2', 3: 'G3', 4: 'G4' };
+
+        for (let b = 1; b <= 4; b++) {
+            let startIndex = (b - 1) * 4;
+            // Auswechslungen am Ende des Blocks verarbeiten (bevor die Labels gesetzt werden)
+            if (b > 1) { // Auswechslungen aus dem VORHERIGEN Block greifen
+                let prevBlock = b - 1;
+                
+                let hOut1 = document.querySelector(`.sub-heim-out-1[data-block="${prevBlock}"]`).value;
+                let hIn1 = document.querySelector(`.sub-heim-in-1[data-block="${prevBlock}"]`).value;
+                if (hOut1 && hIn1) heimSlots[parseInt(hOut1)] = hIn1;
+                
+                let hOut2 = document.querySelector(`.sub-heim-out-2[data-block="${prevBlock}"]`).value;
+                let hIn2 = document.querySelector(`.sub-heim-in-2[data-block="${prevBlock}"]`).value;
+                if (hOut2 && hIn2) heimSlots[parseInt(hOut2)] = hIn2;
+
+                let gOut1 = document.querySelector(`.sub-gast-out-1[data-block="${prevBlock}"]`).value;
+                let gIn1 = document.querySelector(`.sub-gast-in-1[data-block="${prevBlock}"]`).value;
+                if (gOut1 && gIn1) gastSlots[parseInt(gOut1)] = gIn1;
+                
+                let gOut2 = document.querySelector(`.sub-gast-out-2[data-block="${prevBlock}"]`).value;
+                let gIn2 = document.querySelector(`.sub-gast-in-2[data-block="${prevBlock}"]`).value;
+                if (gOut2 && gIn2) gastSlots[parseInt(gOut2)] = gIn2;
+            }
+
+            // Label Updates für die Spiele dieses Blocks inkl. Spielername
+            for(let i = 0; i < 4; i++) {
+                let gameIdx = startIndex + i;
+                let hSlot = basePairings[gameIdx][0]; // 1-4
+                let gSlot = basePairings[gameIdx][1]; // 1-4
+                
+                let currentH = heimSlots[hSlot]; // e.g., 'H1' or 'H5'
+                let currentG = gastSlots[gSlot]; // e.g., 'G1' or 'G5'
+
+                // Index extrahieren (z.B. aus 'H5' die '5')
+                let hIndex = currentH.substring(1);
+                let gIndex = currentG.substring(1);
+
+                // Namen aus den Eingabefeldern holen
+                let hName = document.querySelector(`.player-name-h[data-idx="${hIndex}"]`).value.trim();
+                let gName = document.querySelector(`.player-name-g[data-idx="${gIndex}"]`).value.trim();
+
+                // Nur anzeigen wenn auch ein Name eingetragen wurde
+                let hNameDisplay = hName ? `<span class="player-name-display">(${hName})</span>` : '';
+                let gNameDisplay = gName ? `<span class="player-name-display">(${gName})</span>` : '';
+
+                document.getElementById(`label-heim-${gameIdx+1}`).innerHTML = `${currentH} ${hNameDisplay}`;
+                document.getElementById(`label-gast-${gameIdx+1}`).innerHTML = `${currentG} ${gNameDisplay}`;
+            }
+        }
+    }
+
+    // Wenn sich ein Spielername ändert, die Spielpläne sofort aktualisieren
+    document.querySelectorAll('.player-name-h, .player-name-g').forEach(input => {
+        input.addEventListener('input', updateMatches);
+    });
+
+    document.querySelectorAll('.sub-trigger').forEach(select => {
+        select.addEventListener('change', updateMatches);
+    });
+
+    // --- Logik für den Schwarzen Ring (Modal & Zähler) ---
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const blackRingModal = document.getElementById('blackRingModal');
+    const blackRingList = document.getElementById('blackRingList');
+    const currentPenaltyDisplay = document.getElementById('currentPenaltyDisplay');
+    const heimTeamInput = document.getElementById('heimTeam');
+    const gastTeamInput = document.getElementById('gastTeam');
+    
+    let blackRingCounts = [0, 0, 0, 0, 0, 0]; 
+
+    function updateTeamNameAuto() {
+        const isHeim = document.querySelector('input[name="teamRolle"]:checked').value === 'Heim';
+        if (isHeim) {
+            heimTeamInput.value = MEIN_VEREIN;
+            if (gastTeamInput.value === MEIN_VEREIN) gastTeamInput.value = '';
+        } else {
+            gastTeamInput.value = MEIN_VEREIN;
+            if (heimTeamInput.value === MEIN_VEREIN) heimTeamInput.value = '';
+        }
+    }
+
+    // Zähler zurücksetzen und Vereinsnamen anpassen, wenn zwischen Heim und Gast gewechselt wird
+    document.querySelectorAll('input[name="teamRolle"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            blackRingCounts = [0, 0, 0, 0, 0, 0];
+            updateTeamNameAuto();
+        });
+    });
+
+    // Direkt beim Starten ausführen
+    updateTeamNameAuto();
+    updateMatches(); // Einmal init, damit auch leere Felder initial geladen werden
+
+    function renderModal() {
+        blackRingList.innerHTML = '';
+        
+        // Strafe aktualisieren, falls nicht geblurred wurde
+        if(strafeInput.value) {
+            strafeInput.value = parseFloat(strafeInput.value).toFixed(2);
+        }
+        currentPenaltyDisplay.textContent = parseFloat(strafeInput.value || 0).toFixed(2).replace('.', ',');
+        
+        // Prüfen, ob wir Heim oder Gast sind, um die richtigen Spielernamen zu laden
+        const isHeim = document.querySelector('input[name="teamRolle"]:checked').value === 'Heim';
+        const rolePrefix = isHeim ? 'h' : 'g';
+        const roleLetter = isHeim ? 'H' : 'G';
+        
+        for(let i = 1; i <= 6; i++) {
+            let playerName = document.querySelector(`.player-name-${rolePrefix}[data-idx="${i}"]`).value.trim();
+            if(!playerName) playerName = `Spieler ${roleLetter}${i}`;
+            
+            const row = document.createElement('div');
+            row.className = 'counter-row';
+            row.innerHTML = `
+                <span class="counter-name">${playerName}</span>
+                <div class="counter-controls">
+                    <button type="button" class="counter-btn minus" onclick="updateCount(${i-1}, -1)">-</button>
+                    <span class="counter-val" id="count-val-${i-1}">${blackRingCounts[i-1]}</span>
+                    <button type="button" class="counter-btn" onclick="updateCount(${i-1}, 1)">+</button>
+                </div>
+            `;
+            blackRingList.appendChild(row);
+        }
+    }
+
+    window.updateCount = function(index, change) {
+        let newCount = blackRingCounts[index] + change;
+        if (newCount < 0) newCount = 0; 
+        blackRingCounts[index] = newCount;
+        document.getElementById(`count-val-${index}`).textContent = newCount;
+    }
+
+    openModalBtn.addEventListener('click', () => {
+        renderModal();
+        blackRingModal.style.display = 'flex';
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        blackRingModal.style.display = 'none';
+    });
+
+
+    // --- Formular absenden ---
+    document.getElementById('dartForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMsg = document.getElementById('statusMessage');
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Speichere...';
+        statusMsg.style.display = 'none';
+
+        const mannschaftHeim = [];
+        for(let i = 1; i <= 6; i++) {
+            mannschaftHeim.push({
+                pos: `H${i}`,
+                name: document.querySelector(`.player-name-h[data-idx="${i}"]`).value,
+                pass: document.querySelector(`.player-pass-h[data-idx="${i}"]`).value
+            });
+        }
+
+        const mannschaftGast = [];
+        for(let i = 1; i <= 6; i++) {
+            mannschaftGast.push({
+                pos: `G${i}`,
+                name: document.querySelector(`.player-name-g[data-idx="${i}"]`).value,
+                pass: document.querySelector(`.player-pass-g[data-idx="${i}"]`).value
+            });
+        }
+
+        const spiele = {};
+        for(let i = 1; i <= 16; i++) {
+            // Mit textContent werden die HTML-Tags für Google Sheets sauber als Text gespeichert (z.B. "H1 (Max)")
+            spiele[`spiel_${i}`] = {
+                heim_spieler: document.getElementById(`label-heim-${i}`).textContent.trim(),
+                gast_spieler: document.getElementById(`label-gast-${i}`).textContent.trim(),
+                heim_saetze: document.querySelectorAll(`#heim-sets-${i} .set-box.active`).length,
+                gast_saetze: document.querySelectorAll(`#gast-sets-${i} .set-box.active`).length
+            };
+        }
+
+        const auswechslungen = {};
+        for(let i = 1; i <= 3; i++) {
+            auswechslungen[`nach_block_${i}`] = {
+                heim_1: {
+                    raus: document.querySelector(`.sub-heim-out-1[data-block="${i}"]`).value,
+                    rein: document.querySelector(`.sub-heim-in-1[data-block="${i}"]`).value
+                },
+                heim_2: {
+                    raus: document.querySelector(`.sub-heim-out-2[data-block="${i}"]`).value,
+                    rein: document.querySelector(`.sub-heim-in-2[data-block="${i}"]`).value
+                },
+                gast_1: {
+                    raus: document.querySelector(`.sub-gast-out-1[data-block="${i}"]`).value,
+                    rein: document.querySelector(`.sub-gast-in-1[data-block="${i}"]`).value
+                },
+                gast_2: {
+                    raus: document.querySelector(`.sub-gast-out-2[data-block="${i}"]`).value,
+                    rein: document.querySelector(`.sub-gast-in-2[data-block="${i}"]`).value
+                }
+            };
+        }
+
+        const teamRolle = document.querySelector('input[name="teamRolle"]:checked').value;
+        const strafeWert = parseFloat(strafeInput.value) || 0;
+        const schwarzerRingDaten = [];
+        
+        const isHeim = teamRolle === 'Heim';
+        const rolePrefix = isHeim ? 'h' : 'g';
+        const roleLetter = isHeim ? 'H' : 'G';
+
+        for(let i = 1; i <= 6; i++) {
+            const count = blackRingCounts[i-1];
+            if (count > 0) {
+                let playerName = document.querySelector(`.player-name-${rolePrefix}[data-idx="${i}"]`).value.trim();
+                if(!playerName) playerName = `${roleLetter}${i}`;
+                
+                schwarzerRingDaten.push({
+                    pos: `${roleLetter}${i}`,
+                    name: playerName,
+                    anzahl: count,
+                    betrag: (count * strafeWert).toFixed(2)
+                });
+            }
+        }
+
+        const payload = {
+            teamRolle: teamRolle,
+            datum: document.getElementById('datum').value,
+            liga: document.getElementById('liga').value,
+            spielnr: document.getElementById('spielnr').value,
+            disziplin: document.getElementById('disziplin').value,
+            strafeProWurf: strafeWert,
+            heimTeam: document.getElementById('heimTeam').value,
+            gastTeam: document.getElementById('gastTeam').value,
+            kapitaenHeim: document.getElementById('kapitaenHeim').value,
+            kapitaenGast: document.getElementById('kapitaenGast').value,
+            mannschaftHeim: mannschaftHeim,
+            mannschaftGast: mannschaftGast,
+            spiele: spiele,
+            auswechslungen: auswechslungen,
+            spielergebnisHeim: document.getElementById('spielergebnisHeim').value,
+            spielergebnisGast: document.getElementById('spielergebnisGast').value,
+            gewinnsaetzeHeim: document.getElementById('gewinnsaetzeHeim').value,
+            gewinnsaetzeGast: document.getElementById('gewinnsaetzeGast').value,
+            bestleistungen: {
+                highScore: document.getElementById('highScore').value,
+                highFinish: document.getElementById('highFinish').value,
+                shortGame: document.getElementById('shortGame').value,
+                bullEye: document.getElementById('bullEye').value,
+                bemerkungen: document.getElementById('bemerkungen').value
+            },
+            strafkasse: schwarzerRingDaten
+        };
+
+        try {
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8',
+                }
+            });
+
+            const result = await response.json();
+
+            if(result.status === 'success') {
+                statusMsg.textContent = 'Erfolgreich gespeichert!';
+                statusMsg.className = 'status-msg success';
+                
+                document.getElementById('dartForm').reset();
+                document.querySelectorAll('.set-box.active').forEach(box => box.classList.remove('active'));
+                updateMatches();
+                calculateTotals(); 
+                updateTeamNameAuto();
+                
+                // Strafe nach Reset wieder sauber formatieren
+                strafeInput.value = "0.20";
+                blackRingCounts = [0, 0, 0, 0, 0, 0];
+                
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            statusMsg.textContent = 'Fehler beim Speichern: ' + error.message;
+            statusMsg.className = 'status-msg error';
+        } finally {
+            statusMsg.style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Spielbericht speichern';
+        }
+    });
+</script>
+</body>
+</html>
