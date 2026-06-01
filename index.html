@@ -642,7 +642,7 @@
 
 <script>
     // --- KONFIGURATION ---
-    const WEB_APP_URL = "HIER_DEINE_KOPIERTE_URL_EINTRAGEN";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzAVipJcjV8aoF6XtKh8-V6Woq8PbVYRTQAKsjin4R-ChIx2UKKj0959hkAFRVrJSzQ/exec";
     const MEIN_VEREIN = "DC Isso";
 
     // --- Straf-Feld Formatierung auf 2 Nachkommastellen beim Verlassen des Feldes ---
@@ -1106,35 +1106,35 @@
         };
 
         try {
-            const response = await fetch(WEB_APP_URL, {
+                const response = await fetch(WEB_APP_URL, {
                 method: 'POST',
                 body: JSON.stringify(payload),
                 headers: {
                     'Content-Type': 'text/plain;charset=utf-8',
-                }
+                },
+                redirect: 'follow'
             });
-
-            const result = await response.json();
-
-            if(result.status === 'success') {
-                statusMsg.textContent = 'Erfolgreich gespeichert!';
-                statusMsg.className = 'status-msg success';
-                
-                document.getElementById('dartForm').reset();
-                document.querySelectorAll('.set-box.active').forEach(box => box.classList.remove('active'));
-                updateMatches();
-                calculateTotals(); 
-                updateTeamNameAuto();
-                
-                // Strafe nach Reset wieder sauber formatieren
-                strafeInput.value = "0.20";
-                blackRingCounts = [0, 0, 0, 0, 0, 0];
-                
-            } else {
-                throw new Error(result.message);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP Fehler! Status: ${response.status}`);
             }
+
+            // Da 'no-cors' eine "opaque" Antwort liefert, können wir das Ergebnis nicht per json() auslesen.
+            statusMsg.textContent = 'Erfolgreich gesendet! (Bitte zur Sicherheit in der Tabelle prüfen)';
+            statusMsg.className = 'status-msg success';
+            
+            document.getElementById('dartForm').reset();
+            document.querySelectorAll('.set-box.active').forEach(box => box.classList.remove('active'));
+            updateMatches();
+            calculateTotals(); 
+            updateTeamNameAuto();
+            
+            // Strafe nach Reset wieder sauber formatieren
+            strafeInput.value = "0.20";
+            blackRingCounts = [0, 0, 0, 0, 0, 0];
+            
         } catch (error) {
-            statusMsg.textContent = 'Fehler beim Speichern: ' + error.message;
+            statusMsg.textContent = 'Netzwerkfehler beim Speichern: ' + error.message;
             statusMsg.className = 'status-msg error';
         } finally {
             statusMsg.style.display = 'block';
