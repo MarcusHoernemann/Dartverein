@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DC Isso Spielbericht</title>
+
+<!--########## CSS Design ##########-->    
+
     <style>
         :root {
             --primary: #2c3e50;
@@ -467,6 +470,15 @@
             background-color: var(--primary);
         }
 
+        .copyright {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 15px;
+            font-size: 0.85em;
+            color: var(--secondary);
+            border-top: 1px solid var(--border);
+        }
+
         @media (max-width: 600px) {
             .grid-2 {
                 grid-template-columns: 1fr;
@@ -544,6 +556,8 @@
             </div>
         </div>
 
+<!--########## Mannschaftsaufstellung ##########-->
+
         <h2>Mannschaftsaufstellung</h2>
         <div class="grid-2">
             <div>
@@ -575,6 +589,8 @@
             </div>
         </div>
 
+<!--########## Spielergebnis ##########-->
+
         <h2>Spielplan</h2>
         <div id="matchesContainer">
         </div>
@@ -593,10 +609,12 @@
             </div>
         </div>
 
+<!--########## Bestleistungen ##########-->
+
         <h2>Bestleistungen</h2>
         <div>
             <div class="form-group">
-                <label>High Score (180, 171, 162,151, immer nur das gleiche Triple Segment. Bull Eye 3x)</label>
+                <label>High Score (180, 171, 162,153, immer nur das gleiche Triple Segment. Bull Eye 3x)</label>
                 <input type="text" id="highScore">
             </div>
             <div class="form-group">
@@ -613,6 +631,8 @@
             </div>
         </div>
 
+<!--########## Bemerkungen ##########-->
+
         <h2>Bemerkungen</h2>
         <div class="form-group">
             <textarea id="bemerkungen" rows="3"></textarea>
@@ -621,13 +641,17 @@
         <button type="submit" id="submitBtn" class="submit-btn">Spielbericht speichern</button>
         <div id="statusMessage" class="status-msg"></div>
     </form>
+    
+    <div class="copyright">&copy; 2026 Marcus Hörnemann</div>
 </div>
+
+<!--########## Lakritz Zähler Button ##########-->
 
 <button type="button" class="fab" id="openModalBtn">⚫</button>
 
 <div id="blackRingModal" class="modal">
     <div class="modal-content">
-        <h2 style="margin-top: 0; font-size: 1.5em; border-bottom: none;">Schwarzer Ring Zähler</h2>
+        <h2 style="margin-top: 0; font-size: 1.5em; border-bottom: none;">Lakritz Zähler</h2>
         <p style="font-size: 0.9em; color: var(--secondary); margin-top: -10px;">Strafkasse: <span id="currentPenaltyDisplay">0,20</span> € / Wurf</p>
         <div id="blackRingList">
         </div>
