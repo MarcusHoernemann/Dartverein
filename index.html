@@ -567,10 +567,10 @@
                 </div>
                 <div class="form-group">
                     <label>Teamkapitän (Heim)</label>
-                    <input type="text" id="kapitaenHeim">
+                    <div id="kapitaenHeimContainer"><input type="text" id="kapitaenHeim"></div>
                 </div>
                 <div class="player-grid" id="heimRoster">
-                    <div><strong>Pos.</strong></div><div><strong>Spielername</strong></div><div><strong>Passnr.</strong></div>
+                    <!-- Wird dynamisch durch JS befüllt -->
                 </div>
             </div>
 
@@ -581,10 +581,10 @@
                 </div>
                 <div class="form-group">
                     <label>Teamkapitän (Gast)</label>
-                    <input type="text" id="kapitaenGast">
+                    <div id="kapitaenGastContainer"><input type="text" id="kapitaenGast"></div>
                 </div>
                 <div class="player-grid" id="gastRoster">
-                    <div><strong>Pos.</strong></div><div><strong>Spielername</strong></div><div><strong>Passnr.</strong></div>
+                    <!-- Wird dynamisch durch JS befüllt -->
                 </div>
             </div>
         </div>
@@ -642,7 +642,7 @@
         <div id="statusMessage" class="status-msg"></div>
     </form>
     
-    <div class="copyright">&copy; 2026 Marcus Hörnemann</div>
+    <div class="copyright">&copy; 2026 Marcus Hörnemann 1.3.0</div>
 </div>
 
 <!--########## Lakritz Zähler Button ##########-->
@@ -660,9 +660,21 @@
 </div>
 
 <script>
-    // --- KONFIGURATION ---
+// ###############################################################################################
+// ######################################## KONFIGURATION ########################################
+// ###############################################################################################
+    
+    // --- Google Tabelle URL ---
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzAVipJcjV8aoF6XtKh8-V6Woq8PbVYRTQAKsjin4R-ChIx2UKKj0959hkAFRVrJSzQ/exec";
+    // --- Vereinsname ---
     const MEIN_VEREIN = "DC Isso";
+    // --- Spielernamen ---
+    const unsereSpieler = [
+        "Angelo", "Carsten", "Jens", "Marcus", "Marvin",
+        "Philipp", "Volker", "Spieler 8", "Spieler 9", "Spieler 10"
+    ];
+    // --- Namen erster und zweiter TC ---
+    const unsereKapitaene = ["Jens", "Marcus"];
 
     // --- Straf-Feld Formatierung auf 2 Nachkommastellen ---
     const strafeInput = document.getElementById('strafeWert');
@@ -676,28 +688,64 @@
         }
     });
 
-    // Generierung der Spielerpositionen
-    const heimRoster = document.getElementById('heimRoster');
-    const gastRoster = document.getElementById('gastRoster');
+    // --- Dynamische Roster- & Kapitän-Generierung ---
+    function buildCaptain(prefix, isIsso) {
+        const container = document.getElementById(prefix === 'h' ? 'kapitaenHeimContainer' : 'kapitaenGastContainer');
+        const oldInput = document.getElementById(prefix === 'h' ? 'kapitaenHeim' : 'kapitaenGast');
+        const oldVal = oldInput ? oldInput.value : '';
 
-    for (let i = 1; i <= 6; i++) {
-        const label = i > 4 ? `H${i} (Ersatz)` : `H${i}`;
-        const bgClass = i > 4 ? 'ersatz-bg' : '';
-        heimRoster.innerHTML += `
-            <div><strong>${label}</strong></div>
-            <div><input type="text" class="player-name-h ${bgClass}" data-idx="${i}"></div>
-            <div><input type="text" class="player-pass-h ${bgClass}" data-idx="${i}"></div>
-        `;
+        if (isIsso) {
+            let options = `<option value="">Bitte wählen...</option>`;
+            unsereKapitaene.forEach(k => {
+                let selected = (oldVal === k) ? 'selected' : '';
+                options += `<option value="${k}" ${selected}>${k}</option>`;
+            });
+            container.innerHTML = `<select id="${prefix === 'h' ? 'kapitaenHeim' : 'kapitaenGast'}">${options}</select>`;
+        } else {
+            container.innerHTML = `<input type="text" id="${prefix === 'h' ? 'kapitaenHeim' : 'kapitaenGast'}" value="${oldVal}">`;
+        }
     }
 
-    for (let i = 1; i <= 6; i++) {
-        const label = i > 4 ? `G${i} (Ersatz)` : `G${i}`;
-        const bgClass = i > 4 ? 'ersatz-bg' : '';
-        gastRoster.innerHTML += `
-            <div><strong>${label}</strong></div>
-            <div><input type="text" class="player-name-g ${bgClass}" data-idx="${i}"></div>
-            <div><input type="text" class="player-pass-g ${bgClass}" data-idx="${i}"></div>
-        `;
+    function buildRoster(prefix, isIsso) {
+        const roster = document.getElementById(prefix === 'h' ? 'heimRoster' : 'gastRoster');
+        
+        const oldNames = {};
+        const oldPasses = {};
+        for(let i=1; i<=6; i++) {
+            let el = document.querySelector(`.player-name-${prefix}[data-idx="${i}"]`);
+            if(el) oldNames[i] = el.value;
+            let passEl = document.querySelector(`.player-pass-${prefix}[data-idx="${i}"]`);
+            if(passEl) oldPasses[i] = passEl.value;
+        }
+
+        roster.innerHTML = `<div><strong>Pos.</strong></div><div><strong>Spielername</strong></div><div><strong>Passnr.</strong></div>`;
+
+        for (let i = 1; i <= 6; i++) {
+            const label = i > 4 ? `${prefix.toUpperCase()}${i} (Ersatz)` : `${prefix.toUpperCase()}${i}`;
+            const bgClass = i > 4 ? 'ersatz-bg' : '';
+
+            let nameInput = '';
+            if (isIsso) {
+                let options = `<option value="">Bitte wählen...</option>`;
+                unsereSpieler.forEach(sp => {
+                    let selected = (oldNames[i] === sp) ? 'selected' : '';
+                    options += `<option value="${sp}" ${selected}>${sp}</option>`;
+                });
+                nameInput = `<select class="player-name-${prefix} ${bgClass}" data-idx="${i}">${options}</select>`;
+            } else {
+                let val = oldNames[i] || '';
+                nameInput = `<input type="text" class="player-name-${prefix} ${bgClass}" data-idx="${i}" value="${val}">`;
+            }
+
+            let passVal = oldPasses[i] || '';
+            let passInput = `<input type="text" class="player-pass-${prefix} ${bgClass}" data-idx="${i}" value="${passVal}">`;
+
+            roster.innerHTML += `
+                <div><strong>${label}</strong></div>
+                <div>${nameInput}</div>
+                <div>${passInput}</div>
+            `;
+        }
     }
 
     const basePairings = [
@@ -903,8 +951,11 @@
                 let hIndex = currentH.substring(1);
                 let gIndex = currentG.substring(1);
 
-                let hName = document.querySelector(`.player-name-h[data-idx="${hIndex}"]`).value.trim();
-                let gName = document.querySelector(`.player-name-g[data-idx="${gIndex}"]`).value.trim();
+                let hInput = document.querySelector(`.player-name-h[data-idx="${hIndex}"]`);
+                let gInput = document.querySelector(`.player-name-g[data-idx="${gIndex}"]`);
+
+                let hName = hInput ? hInput.value.trim() : '';
+                let gName = gInput ? gInput.value.trim() : '';
 
                 let hNameDisplay = hName ? `<span class="player-name-display">(${hName})</span>` : '';
                 let gNameDisplay = gName ? `<span class="player-name-display">(${gName})</span>` : '';
@@ -915,8 +966,15 @@
         }
     }
 
-    document.querySelectorAll('.player-name-h, .player-name-g').forEach(input => {
-        input.addEventListener('input', updateMatches);
+    // Event Delegation für dynamisch erstellte Roster Felder
+    ['heimRoster', 'gastRoster'].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('change', function(e) {
+            if(e.target.classList.contains('player-name-h') || e.target.classList.contains('player-name-g')) updateMatches();
+        });
+        el.addEventListener('input', function(e) {
+            if(e.target.classList.contains('player-name-h') || e.target.classList.contains('player-name-g')) updateMatches();
+        });
     });
 
     document.querySelectorAll('.sub-trigger').forEach(select => {
@@ -943,10 +1001,19 @@
         if (isHeim) {
             heimTeamInput.value = MEIN_VEREIN;
             if (gastTeamInput.value === MEIN_VEREIN) gastTeamInput.value = '';
+            buildCaptain('h', true);
+            buildCaptain('g', false);
+            buildRoster('h', true);
+            buildRoster('g', false);
         } else {
             gastTeamInput.value = MEIN_VEREIN;
             if (heimTeamInput.value === MEIN_VEREIN) heimTeamInput.value = '';
+            buildCaptain('h', false);
+            buildCaptain('g', true);
+            buildRoster('h', false);
+            buildRoster('g', true);
         }
+        updateMatches();
     }
 
     // Wenn gewechselt wird, wird der Name angepasst, aber die Zähler BLEIBEN erhalten
@@ -954,8 +1021,8 @@
         radio.addEventListener('change', updateTeamNameAuto);
     });
 
+    // Initiales Setup
     updateTeamNameAuto();
-    updateMatches(); 
 
     function renderModal() {
         blackRingList.innerHTML = '';
@@ -1137,9 +1204,8 @@
             
             document.getElementById('dartForm').reset();
             document.querySelectorAll('.set-box.active').forEach(box => box.classList.remove('active'));
-            updateMatches();
+            updateTeamNameAuto(); // Reset stellt auch Checkboxen zurück, daher alles wieder passend aufbauen
             calculateTotals(); 
-            updateTeamNameAuto();
             
             // Strafen und Zähler nach Erfolg komplett auf null setzen
             strafeInput.value = "0.20";
