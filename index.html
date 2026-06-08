@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DC Issso Spielbericht</title>
 
-    <!-- PWA & Homescreen Icons -->
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" sizes="192x192" href="logo.png">
-    <link rel="apple-touch-icon" href="logo.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="logo.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="logo.png">
+    <link rel="manifest" href="/Dartverein/manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="/Dartverein/logo.png">
+    <link rel="apple-touch-icon" href="/Dartverein/logo.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/Dartverein/logo.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/Dartverein/logo.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/Dartverein/logo.png">
     
     <meta name="theme-color" content="#121212">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,9 +18,7 @@
     <meta name="apple-mobile-web-app-title" content="DC Issso">
     <meta name="mobile-web-app-capable" content="yes">
 
-<!--########## CSS Design ##########-->    
-
-    <style>
+<style>
         :root {
             --primary: #85c1e9;
             --secondary: #7f8c8d;
@@ -57,6 +54,26 @@
             color: var(--primary);
             border-bottom: 2px solid var(--border);
             padding-bottom: 5px;
+        }
+
+        .install-btn {
+            display: none;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: background-color 0.3s;
+        }
+
+        .install-btn:hover {
+            background-color: #2ecc71;
         }
 
         .grid-2 {
@@ -547,6 +564,8 @@
 <div class="container">
     <h1>DC Issso Spielbericht</h1>
     
+    <button id="installAppBtn" class="install-btn">📱 App auf Startbildschirm installieren</button>
+
     <form id="dartForm">
         
         <div class="settings-bar">
@@ -585,9 +604,7 @@
             </div>
         </div>
 
-<!--########## Mannschaftsaufstellung ##########-->
-
-        <h2>Mannschaftsaufstellung</h2>
+<h2>Mannschaftsaufstellung</h2>
         <div class="grid-2">
             <div>
                 <div class="form-group">
@@ -599,8 +616,7 @@
                     <div id="kapitaenHeimContainer"><input type="text" id="kapitaenHeim"></div>
                 </div>
                 <div class="player-grid" id="heimRoster">
-                    <!-- Wird dynamisch durch JS befüllt -->
-                </div>
+                    </div>
             </div>
 
             <div>
@@ -613,14 +629,11 @@
                     <div id="kapitaenGastContainer"><input type="text" id="kapitaenGast"></div>
                 </div>
                 <div class="player-grid" id="gastRoster">
-                    <!-- Wird dynamisch durch JS befüllt -->
-                </div>
+                    </div>
             </div>
         </div>
 
-<!--########## Spielergebnis ##########-->
-
-        <h2>Spielplan</h2>
+<h2>Spielplan</h2>
         <div id="matchesContainer">
         </div>
 
@@ -638,9 +651,7 @@
             </div>
         </div>
 
-<!--########## Bestleistungen ##########-->
-
-        <h2>Bestleistungen</h2>
+<h2>Bestleistungen</h2>
         <div>
             <div class="form-group">
                 <label>High Score (180, 171, 162,153, immer nur das gleiche Triple Segment. Bull Eye 3x)</label>
@@ -660,9 +671,7 @@
             </div>
         </div>
 
-<!--########## Bemerkungen ##########-->
-
-        <h2>Bemerkungen</h2>
+<h2>Bemerkungen</h2>
         <div class="form-group">
             <textarea id="bemerkungen" rows="3"></textarea>
         </div>
@@ -671,10 +680,8 @@
         <div id="statusMessage" class="status-msg"></div>
     </form>
     
-    <div class="copyright">&copy; 2026 Marcus Hörnemann 1.3.10</div>
+    <div class="copyright">&copy; 2026 Marcus Hörnemann 1.3.11</div>
 </div>
-
-<!--########## Lakritz Zähler Button ##########-->
 
 <button type="button" class="fab" id="openModalBtn">⚫</button>
 
@@ -1250,12 +1257,36 @@
         }
     });
 
-    // PWA Service Worker Registration
+    // --- PWA Installation & Service Worker ---
+    let deferredPrompt;
+    const installAppBtn = document.getElementById('installAppBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Standard-Anzeige des Browsers unterdrücken
+        e.preventDefault();
+        // Event für später speichern
+        deferredPrompt = e;
+        // Unseren eigenen Button einblenden
+        installAppBtn.style.display = 'block';
+    });
+
+    installAppBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                console.log('App wurde installiert');
+            }
+            deferredPrompt = null;
+            installAppBtn.style.display = 'none';
+        }
+    });
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
+        navigator.serviceWorker.register('/Dartverein/sw.js')
           .then(registration => {
-            console.log('ServiceWorker registriert:', registration);
+            console.log('ServiceWorker erfolgreich registriert:', registration.scope);
           })
           .catch(error => {
             console.log('ServiceWorker Fehler:', error);
