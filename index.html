@@ -2,22 +2,26 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DC Issso Spielbericht</title>
 
+    <!-- PWA & Homescreen Icons -->
     <link rel="manifest" href="/Dartverein/manifest.json">
-    
-    <link rel="icon" type="image/png" href="/Dartverein/logo.png">
-    
-    <link rel="apple-touch-icon" href="/Dartverein/logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/Dartverein/icon.png">
+    <link rel="apple-touch-icon" href="/Dartverein/icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/Dartverein/icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/Dartverein/icon.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/Dartverein/icon.png">
     
     <meta name="theme-color" content="#121212">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DC Issso">
-</head>
+    <meta name="mobile-web-app-capable" content="yes">
 
-<style>
+<!--########## CSS Design ##########-->    
+
+    <style>
         :root {
             --primary: #85c1e9;
             --secondary: #7f8c8d;
@@ -118,7 +122,6 @@
             width: 100%;
         }
 
-        /* Fix für Dropdown-Optionen (Auswahlliste) im Darkmode */
         select option {
             background-color: var(--input-bg);
             color: var(--text);
@@ -603,7 +606,9 @@
             </div>
         </div>
 
-<h2>Mannschaftsaufstellung</h2>
+<!--########## Mannschaftsaufstellung ##########-->
+
+        <h2>Mannschaftsaufstellung</h2>
         <div class="grid-2">
             <div>
                 <div class="form-group">
@@ -615,7 +620,8 @@
                     <div id="kapitaenHeimContainer"><input type="text" id="kapitaenHeim"></div>
                 </div>
                 <div class="player-grid" id="heimRoster">
-                    </div>
+                    <!-- Wird dynamisch durch JS befüllt -->
+                </div>
             </div>
 
             <div>
@@ -628,11 +634,14 @@
                     <div id="kapitaenGastContainer"><input type="text" id="kapitaenGast"></div>
                 </div>
                 <div class="player-grid" id="gastRoster">
-                    </div>
+                    <!-- Wird dynamisch durch JS befüllt -->
+                </div>
             </div>
         </div>
 
-<h2>Spielplan</h2>
+<!--########## Spielergebnis ##########-->
+
+        <h2>Spielplan</h2>
         <div id="matchesContainer">
         </div>
 
@@ -650,7 +659,9 @@
             </div>
         </div>
 
-<h2>Bestleistungen</h2>
+<!--########## Bestleistungen ##########-->
+
+        <h2>Bestleistungen</h2>
         <div>
             <div class="form-group">
                 <label>High Score (180, 171, 162,153, immer nur das gleiche Triple Segment. Bull Eye 3x)</label>
@@ -670,7 +681,9 @@
             </div>
         </div>
 
-<h2>Bemerkungen</h2>
+<!--########## Bemerkungen ##########-->
+
+        <h2>Bemerkungen</h2>
         <div class="form-group">
             <textarea id="bemerkungen" rows="3"></textarea>
         </div>
@@ -681,6 +694,8 @@
     
     <div class="copyright">&copy; 2026 Marcus Hörnemann 1.3.11</div>
 </div>
+
+<!--########## Lakritz Zähler Button ##########-->
 
 <button type="button" class="fab" id="openModalBtn">⚫</button>
 
@@ -699,19 +714,14 @@
 // ######################################## KONFIGURATION ########################################
 // ###############################################################################################
     
-    // --- Google Tabelle URL ---
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzAVipJcjV8aoF6XtKh8-V6Woq8PbVYRTQAKsjin4R-ChIx2UKKj0959hkAFRVrJSzQ/exec";
-    // --- Vereinsname ---
     const MEIN_VEREIN = "DC Issso";
-    // --- Spielernamen ---
     const unsereSpieler = [
         "Angelo", "Carsten", "Jens", "Marcus", "Marvin",
         "Philipp", "Volker", "Spieler 8", "Spieler 9", "Spieler 10"
     ];
-    // --- Namen erster und zweiter TC ---
     const unsereKapitaene = ["Jens", "Marcus"];
 
-    // --- Straf-Feld Formatierung auf 2 Nachkommastellen ---
     const strafeInput = document.getElementById('strafeWert');
     strafeInput.addEventListener('blur', function() {
         if(this.value) {
@@ -723,7 +733,6 @@
         }
     });
 
-    // --- Dynamische Roster- & Kapitän-Generierung ---
     function buildCaptain(prefix, isIsso) {
         const container = document.getElementById(prefix === 'h' ? 'kapitaenHeimContainer' : 'kapitaenGastContainer');
         const oldInput = document.getElementById(prefix === 'h' ? 'kapitaenHeim' : 'kapitaenGast');
@@ -784,10 +793,10 @@
     }
 
     const basePairings = [
-        [1,1], [2,2], [3,3], [4,4], // Block 1
-        [1,2], [2,4], [3,1], [4,3], // Block 2
-        [1,3], [2,1], [3,4], [4,2], // Block 3
-        [1,4], [2,3], [3,2], [4,1]  // Block 4
+        [1,1], [2,2], [3,3], [4,4], 
+        [1,2], [2,4], [3,1], [4,3], 
+        [1,3], [2,1], [3,4], [4,2], 
+        [1,4], [2,3], [3,2], [4,1] 
     ];
 
     const matchesContainer = document.getElementById('matchesContainer');
@@ -1001,7 +1010,6 @@
         }
     }
 
-    // Event Delegation für dynamisch erstellte Roster Felder
     ['heimRoster', 'gastRoster'].forEach(id => {
         const el = document.getElementById(id);
         el.addEventListener('change', function(e) {
@@ -1016,7 +1024,6 @@
         select.addEventListener('change', updateMatches);
     });
 
-    // --- Logik für den Schwarzen Ring (Robuste Version für Heim UND Gast) ---
     const openModalBtn = document.getElementById('openModalBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const blackRingModal = document.getElementById('blackRingModal');
@@ -1025,7 +1032,6 @@
     const heimTeamInput = document.getElementById('heimTeam');
     const gastTeamInput = document.getElementById('gastTeam');
     
-    // Beide Mannschaften werden fest gespeichert, damit kein Zähler aus Versehen gelöscht wird
     let penalties = {
         h: [0, 0, 0, 0, 0, 0],
         g: [0, 0, 0, 0, 0, 0]
@@ -1051,12 +1057,10 @@
         updateMatches();
     }
 
-    // Wenn gewechselt wird, wird der Name angepasst, aber die Zähler BLEIBEN erhalten
     document.querySelectorAll('input[name="teamRolle"]').forEach(radio => {
         radio.addEventListener('change', updateTeamNameAuto);
     });
 
-    // Initiales Setup
     updateTeamNameAuto();
 
     function renderModal() {
@@ -1071,11 +1075,8 @@
         const letter = isHeim ? 'H' : 'G';
         
         for(let i = 1; i <= 6; i++) {
-            // Live-Abfrage des Namens im Moment des Öffnens
             let inputEl = document.querySelector(`.player-name-${prefix}[data-idx="${i}"]`);
             let playerName = inputEl ? inputEl.value.trim() : '';
-            
-            // Wenn kein Name eingetragen ist, falle auf H1/G1 zurück
             if(!playerName) playerName = `${letter}${i}`;
             
             const row = document.createElement('div');
@@ -1108,10 +1109,8 @@
         blackRingModal.style.display = 'none';
     });
 
-    // --- Formular absenden ---
     document.getElementById('dartForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
         const submitBtn = document.getElementById('submitBtn');
         const statusMsg = document.getElementById('statusMessage');
         
@@ -1127,7 +1126,6 @@
                 pass: document.querySelector(`.player-pass-h[data-idx="${i}"]`).value
             });
         }
-
         const mannschaftGast = [];
         for(let i = 1; i <= 6; i++) {
             mannschaftGast.push({
@@ -1136,7 +1134,6 @@
                 pass: document.querySelector(`.player-pass-g[data-idx="${i}"]`).value
             });
         }
-
         const spiele = {};
         for(let i = 1; i <= 16; i++) {
             spiele[`spiel_${i}`] = {
@@ -1146,36 +1143,19 @@
                 gast_saetze: document.querySelectorAll(`#gast-sets-${i} .set-box.active`).length
             };
         }
-
         const auswechslungen = {};
         for(let i = 1; i <= 3; i++) {
             auswechslungen[`nach_block_${i}`] = {
-                heim_1: {
-                    raus: document.querySelector(`.sub-heim-out-1[data-block="${i}"]`).value,
-                    rein: document.querySelector(`.sub-heim-in-1[data-block="${i}"]`).value
-                },
-                heim_2: {
-                    raus: document.querySelector(`.sub-heim-out-2[data-block="${i}"]`).value,
-                    rein: document.querySelector(`.sub-heim-in-2[data-block="${i}"]`).value
-                },
-                gast_1: {
-                    raus: document.querySelector(`.sub-gast-out-1[data-block="${i}"]`).value,
-                    rein: document.querySelector(`.sub-gast-in-1[data-block="${i}"]`).value
-                },
-                gast_2: {
-                    raus: document.querySelector(`.sub-gast-out-2[data-block="${i}"]`).value,
-                    rein: document.querySelector(`.sub-gast-in-2[data-block="${i}"]`).value
-                }
+                heim_1: { raus: document.querySelector(`.sub-heim-out-1[data-block="${i}"]`).value, rein: document.querySelector(`.sub-heim-in-1[data-block="${i}"]`).value },
+                heim_2: { raus: document.querySelector(`.sub-heim-out-2[data-block="${i}"]`).value, rein: document.querySelector(`.sub-heim-in-2[data-block="${i}"]`).value },
+                gast_1: { raus: document.querySelector(`.sub-gast-out-1[data-block="${i}"]`).value, rein: document.querySelector(`.sub-gast-in-1[data-block="${i}"]`).value },
+                gast_2: { raus: document.querySelector(`.sub-gast-out-2[data-block="${i}"]`).value, rein: document.querySelector(`.sub-gast-in-2[data-block="${i}"]`).value }
             };
         }
-
         const teamRolle = document.querySelector('input[name="teamRolle"]:checked').value;
-        
         let rawStrafe = strafeInput.value.toString().replace(',', '.');
         const strafeWert = parseFloat(rawStrafe) || 0;
         const schwarzerRingDaten = [];
-        
-        // Beide Mannschaftsseiten (H und G) nach Strafen absuchen, um nichts zu übersehen
         ['h', 'g'].forEach(prefix => {
             let letter = prefix === 'h' ? 'H' : 'G';
             for(let i = 1; i <= 6; i++) {
@@ -1184,7 +1164,6 @@
                     let inputEl = document.querySelector(`.player-name-${prefix}[data-idx="${i}"]`);
                     let playerName = inputEl ? inputEl.value.trim() : '';
                     if(!playerName) playerName = `${letter}${i}`;
-                    
                     schwarzerRingDaten.push({
                         pos: `${letter}${i}`,
                         name: playerName,
@@ -1229,25 +1208,18 @@
                 method: 'POST',
                 mode: 'no-cors',
                 body: JSON.stringify(payload),
-                headers: {
-                    'Content-Type': 'text/plain;charset=utf-8',
-                }
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
             });
-
-            statusMsg.textContent = 'Erfolgreich gesendet! (Bitte zur Sicherheit in der Tabelle prüfen)';
+            statusMsg.textContent = 'Erfolgreich gesendet!';
             statusMsg.className = 'status-msg success';
-            
             document.getElementById('dartForm').reset();
             document.querySelectorAll('.set-box.active').forEach(box => box.classList.remove('active'));
-            updateTeamNameAuto(); // Reset stellt auch Checkboxen zurück, daher alles wieder passend aufbauen
-            calculateTotals(); 
-            
-            // Strafen und Zähler nach Erfolg komplett auf null setzen
+            updateTeamNameAuto();
+            calculateTotals();
             strafeInput.value = "0.20";
             penalties = { h: [0,0,0,0,0,0], g: [0,0,0,0,0,0] };
-            
         } catch (error) {
-            statusMsg.textContent = 'Netzwerkfehler beim Speichern: ' + error.message;
+            statusMsg.textContent = 'Fehler: ' + error.message;
             statusMsg.className = 'status-msg error';
         } finally {
             statusMsg.style.display = 'block';
@@ -1256,41 +1228,28 @@
         }
     });
 
-    // --- PWA Installation & Service Worker ---
     let deferredPrompt;
-    const installAppBtn = document.getElementById('installAppBtn');
-
     window.addEventListener('beforeinstallprompt', (e) => {
-        // Standard-Anzeige des Browsers unterdrücken
         e.preventDefault();
-        // Event für später speichern
         deferredPrompt = e;
-        // Unseren eigenen Button einblenden
-        installAppBtn.style.display = 'block';
+        const btn = document.getElementById('installAppBtn');
+        if(btn) btn.style.display = 'block';
     });
 
-    installAppBtn.addEventListener('click', async () => {
+    document.getElementById('installAppBtn').addEventListener('click', async () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                console.log('App wurde installiert');
-            }
             deferredPrompt = null;
-            installAppBtn.style.display = 'none';
+            document.getElementById('installAppBtn').style.display = 'none';
         }
     });
 
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/Dartverein/sw.js')
-          .then(registration => {
-            console.log('ServiceWorker erfolgreich registriert:', registration.scope);
-          })
-          .catch(error => {
-            console.log('ServiceWorker Fehler:', error);
-          });
-      });
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/Dartverein/sw.js')
+                .catch(error => console.log('SW Fehler:', error));
+        });
     }
 </script>
 </body>
