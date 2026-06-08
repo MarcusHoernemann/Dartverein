@@ -1,19 +1,19 @@
 {
   "name": "DC Issso Spielbericht",
   "short_name": "Dartlog",
-  "start_url": "https://deine-domain.de/",
+  "start_url": "https://marcushoernemann.github.io/Dartverein/",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#121212",
   "icons": [
     {
-      "src": "https://deine-domain.de/logo.png?v=4",
+      "src": "https://marcushoernemann.github.io/Dartverein/logo.png?v=6",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://deine-domain.de/logo.png?v=4",
+      "src": "https://marcushoernemann.github.io/Dartverein/logo.png?v=6",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
