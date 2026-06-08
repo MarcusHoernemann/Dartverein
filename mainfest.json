@@ -7,13 +7,13 @@
   "theme_color": "#121212",
   "icons": [
     {
-      "src": "https://marcushoernemann.github.io/Dartverein/logo.png?v=6",
+      "src": "https://marcushoernemann.github.io/Dartverein/logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://marcushoernemann.github.io/Dartverein/logo.png?v=6",
+      "src": "https://marcushoernemann.github.io/Dartverein/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
